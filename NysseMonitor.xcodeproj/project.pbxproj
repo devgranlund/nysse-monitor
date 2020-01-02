@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		470F24F923BE95FD00E29BB9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 470F24F823BE95FD00E29BB9 /* Alamofire */; };
 		4764F6E323BE76DB002D7DA1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4764F6E223BE76DB002D7DA1 /* AppDelegate.swift */; };
 		4764F6E523BE76DB002D7DA1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4764F6E423BE76DB002D7DA1 /* SceneDelegate.swift */; };
 		4764F6E723BE76DB002D7DA1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4764F6E623BE76DB002D7DA1 /* ContentView.swift */; };
@@ -56,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				470F24F923BE95FD00E29BB9 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,6 +154,9 @@
 			dependencies = (
 			);
 			name = NysseMonitor;
+			packageProductDependencies = (
+				470F24F823BE95FD00E29BB9 /* Alamofire */,
+			);
 			productName = NysseMonitor;
 			productReference = 4764F6DF23BE76DB002D7DA1 /* NysseMonitor.app */;
 			productType = "com.apple.product-type.application";
@@ -224,6 +229,9 @@
 				Base,
 			);
 			mainGroup = 4764F6D623BE76DB002D7DA1;
+			packageReferences = (
+				470F24F723BE95FD00E29BB9 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
 			productRefGroup = 4764F6E023BE76DB002D7DA1 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -594,6 +602,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		470F24F723BE95FD00E29BB9 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = "5.0.0-rc.3";
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		470F24F823BE95FD00E29BB9 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 470F24F723BE95FD00E29BB9 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4764F6D723BE76DB002D7DA1 /* Project object */;
 }

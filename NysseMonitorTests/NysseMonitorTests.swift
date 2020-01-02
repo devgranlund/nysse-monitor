@@ -30,5 +30,19 @@ class NysseMonitorTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
-
+    
+    //MARK: StopPoint Class Tests
+    func testStopPointInitializationSucceeds() {
+        let validStopPoint = StopPoint.init(url: "http://178.217.134.14/journeys/api/1/stop-points/2524",
+                                            name: "Valmetinkatu",
+                                            shortName: "2524")
+        XCTAssertNotNil(validStopPoint)
+    }
+    
+    func testStopPointInitializationFails() {
+        let nonValidStopPoint = StopPoint.init(url: "http://178.217.134.14/journeys/api/1/stop-points/2558",
+                                               name: "Valmetinkatu",
+                                               shortName: "")
+        XCTAssertNil(nonValidStopPoint)
+    }
 }

@@ -7,26 +7,23 @@
 //
 
 import SwiftUI
-
-private let dateFormatter: DateFormatter = {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateStyle = .medium
-    dateFormatter.timeStyle = .medium
-    return dateFormatter
-}()
+import Alamofire
 
 struct ContentView: View {
-    @State private var dates = [Date]()
+    @State private var stopPoints = [String]()
 
     var body: some View {
         NavigationView {
-            MasterView(dates: $dates)
-                .navigationBarTitle(Text("Master"))
+            MasterView(stopPoints: $stopPoints)
+                .navigationBarTitle(Text("Pysäkit"))
                 .navigationBarItems(
                     leading: EditButton(),
                     trailing: Button(
                         action: {
-                            withAnimation { self.dates.insert(Date(), at: 0) }
+                            //withAnimation { self.stopPoints.insert(Date(), at: 0) }
+                            AF.request("http://data.itsfactory.fi/journeys/api/1/stop-points/2524").responseString {
+                                response in self.stopPoints.insert(response.value ?? "response nil", at: 0)
+                            }
                         }
                     ) {
                         Image(systemName: "plus")
@@ -38,37 +35,36 @@ struct ContentView: View {
 }
 
 struct MasterView: View {
-    @Binding var dates: [Date]
+    @Binding var stopPoints: [String]
 
     var body: some View {
         List {
-            ForEach(dates, id: \.self) { date in
+            ForEach(stopPoints, id: \.self) { stopPoint in
                 NavigationLink(
-                    destination: DetailView(selectedDate: date)
+                    destination: DetailView(selectedStopPoint: stopPoint)
                 ) {
-                    Text("\(date, formatter: dateFormatter)")
+                    Text(stopPoint)
                 }
             }.onDelete { indices in
-                indices.forEach { self.dates.remove(at: $0) }
+                indices.forEach { self.stopPoints.remove(at: $0) }
             }
         }
     }
 }
 
 struct DetailView: View {
-    var selectedDate: Date?
+    var selectedStopPoint: String?
 
     var body: some View {
         Group {
-            if selectedDate != nil {
-                Text("\(selectedDate!, formatter: dateFormatter)")
+            if selectedStopPoint != nil {
+                Text(selectedStopPoint!)
             } else {
                 Text("Detail view content goes here")
             }
         }.navigationBarTitle(Text("Detail"))
     }
 }
-
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
