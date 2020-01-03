@@ -18,22 +18,20 @@ class NysseMonitorTests: XCTestCase {
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+    
+    //MARK: DomainObject Class Tests
+    func testDomainObjectInitializationSucceeds() {
+        let domainModel = DomainModel()
+        XCTAssertNotNil(domainModel)
+        
+        // domain model has correct number of stop points
+        XCTAssertEqual(domainModel.stopPoints.count, 1)
     }
     
     //MARK: StopPoint Class Tests
     func testStopPointInitializationSucceeds() {
         let validStopPoint = StopPoint.init(url: "http://178.217.134.14/journeys/api/1/stop-points/2524",
+                                            monitoringUrl: "http://data.itsfactory.fi/journeys/api/1/stop-monitoring?stops=2524",
                                             name: "Valmetinkatu",
                                             shortName: "2524")
         XCTAssertNotNil(validStopPoint)
@@ -41,6 +39,7 @@ class NysseMonitorTests: XCTestCase {
     
     func testStopPointInitializationFails() {
         let nonValidStopPoint = StopPoint.init(url: "http://178.217.134.14/journeys/api/1/stop-points/2558",
+                                               monitoringUrl: "http://data.itsfactory.fi/journeys/api/1/stop-monitoring?stops=2558",
                                                name: "Valmetinkatu",
                                                shortName: "")
         XCTAssertNil(nonValidStopPoint)

@@ -10,7 +10,7 @@ import SwiftUI
 import Alamofire
 
 struct ContentView: View {
-    @State private var stopPoints = [String]()
+    @State private var stopPoints = DomainModel().stopPoints
 
     var body: some View {
         NavigationView {
@@ -20,13 +20,15 @@ struct ContentView: View {
                     leading: EditButton(),
                     trailing: Button(
                         action: {
-                            //withAnimation { self.stopPoints.insert(Date(), at: 0) }
-                            AF.request("http://data.itsfactory.fi/journeys/api/1/stop-points/2524").responseString {
-                                response in self.stopPoints.insert(response.value ?? "response nil", at: 0)
+                            
+                            self.stopPoints.forEach { stopPoint in
+                                AF.request(stopPoint.getMonitoringUrl).responseString {
+                                    response in stopPoint.setJson(json: response.value ?? "EMPTY")
+                                }
                             }
                         }
                     ) {
-                        Image(systemName: "plus")
+                        Image(systemName: "arrow.clockwise")
                     }
                 )
             DetailView()
@@ -35,7 +37,7 @@ struct ContentView: View {
 }
 
 struct MasterView: View {
-    @Binding var stopPoints: [String]
+    @Binding var stopPoints: [StopPoint]
 
     var body: some View {
         List {
@@ -43,7 +45,7 @@ struct MasterView: View {
                 NavigationLink(
                     destination: DetailView(selectedStopPoint: stopPoint)
                 ) {
-                    Text(stopPoint)
+                    Text(stopPoint.getName)
                 }
             }.onDelete { indices in
                 indices.forEach { self.stopPoints.remove(at: $0) }
@@ -53,16 +55,16 @@ struct MasterView: View {
 }
 
 struct DetailView: View {
-    var selectedStopPoint: String?
+    var selectedStopPoint: StopPoint?
 
     var body: some View {
         Group {
             if selectedStopPoint != nil {
-                Text(selectedStopPoint!)
+                Text(selectedStopPoint!.getDepartures!.body!.lines![0].getInfo)
             } else {
                 Text("Detail view content goes here")
             }
-        }.navigationBarTitle(Text("Detail"))
+        }.navigationBarTitle(Text(selectedStopPoint?.getName ?? "Tuntematon pysäkki"))
     }
 }
 
