@@ -13,11 +13,20 @@ class DomainModel {
     var stopPoints: [StopPoint] = []
     
     init() {
+        
+        // Valmentinkatu to the city centrum
         let valmetinkatu = StopPoint.init(url: "http://178.217.134.14/journeys/api/1/stop-points/2524",
         monitoringUrl: "http://data.itsfactory.fi/journeys/api/1/stop-monitoring?stops=2524",
                                           name: "Valmetinkatu",
         shortName: "2524")
         stopPoints.append(valmetinkatu!)
+        
+        // Rautatieasema to Valmetinkatu
+        let rautatieasema = StopPoint.init(url: "http://178.217.134.14/journeys/api/1/stop-points/0505",
+        monitoringUrl: "http://data.itsfactory.fi/journeys/api/1/stop-monitoring?stops=0505",
+                                          name: "Rautatieasema",
+        shortName: "0505")
+        stopPoints.append(rautatieasema!)
     }
 }
 
@@ -81,17 +90,22 @@ struct Departures: Codable {
     private enum CodingKeys: String, CodingKey {
         case body = "body"
     }
+    
+    var getLines: [Line]{
+        return self.body!.lines!
+    }
 }
 
 struct Body: Codable {
     let lines: [Line]?
     
     private enum CodingKeys: String, CodingKey {
-        case lines = "2524"
+        case lines = "2524" // TODO 2524    
     }
 }
 
-struct Line: Codable {
+struct Line: Codable, Hashable {
+    
     let lineRef: String?
     let call: Call?
     
@@ -101,8 +115,42 @@ struct Line: Codable {
     }
     
     var getInfo: String {
-        let info = self.lineRef! + "->" + self.call!.getInfo
+        let info = self.lineRef! + " -> " + self.call!.getInfo
         return info
+    }
+    
+    var getLineRef: String {
+        return self.lineRef!
+    }
+    
+    var getArrivalStatus: String {
+        return self.call!.arrivalStatus!
+    }
+    
+    var getExpectedArrivalTime: String {
+        return self.call!.expectedArrivalTime!
+    }
+    
+    var getExactExpectedArrivalTime: String {
+        let formatter = DateFormatter()
+        formatter.timeZone = .current
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: getExpectedArrivalTimeDate)
+    }
+    
+    var getExpectedArrivalTimeDate: Date {
+        let formatter  = ISO8601DateFormatter()
+        return formatter.date(from: getExpectedArrivalTime)!
+    }
+    
+    // Equatable
+    static func == (lhs: Line, rhs: Line) -> Bool {
+        return (lhs.getLineRef == rhs.getLineRef) && (lhs.getExpectedArrivalTime == rhs.getExpectedArrivalTime)
+    }
+    
+    // Hashable
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.getLineRef)
     }
 }
 

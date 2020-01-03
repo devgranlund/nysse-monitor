@@ -60,11 +60,25 @@ struct DetailView: View {
     var body: some View {
         Group {
             if selectedStopPoint != nil {
-                Text(selectedStopPoint!.getDepartures!.body!.lines![0].getInfo)
+                List(selectedStopPoint!.getDepartures!.getLines, id: \.self) { line in
+                    DetailRow(line: line)
+                }
             } else {
                 Text("Detail view content goes here")
             }
         }.navigationBarTitle(Text(selectedStopPoint?.getName ?? "Tuntematon pysäkki"))
+    }
+}
+
+struct DetailRow: View {
+    var line: Line?
+
+    var body: some View {
+        Group {
+            Text(line!.getExactExpectedArrivalTime)
+            Text(" -> ")
+            Text(line!.getLineRef)
+        }
     }
 }
 
