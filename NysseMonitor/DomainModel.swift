@@ -65,9 +65,15 @@ class StopPoint: Hashable {
     }
     
     func setJson(json: String){
-        self.json = json
+        
+        // Dirty trick to mutate original JSON message
+        // - hard coded stop point short name as a JSON element key is replaced in
+        // order to allow dynamic handling of different stop points' JSON messages
+        let mutatedJson = json.replacingOccurrences(of: self.shortName, with: "lines")
+        
+        self.json = mutatedJson
         do {
-            self.departures = try JSONDecoder().decode(Departures.self, from: json.data(using: .utf8)!)
+            self.departures = try JSONDecoder().decode(Departures.self, from: mutatedJson.data(using: .utf8)!)
         } catch {
             print(error)
         }
@@ -100,7 +106,7 @@ struct Body: Codable {
     let lines: [Line]?
     
     private enum CodingKeys: String, CodingKey {
-        case lines = "2524" // TODO 2524    
+        case lines = "lines"
     }
 }
 
@@ -135,12 +141,14 @@ struct Line: Codable, Hashable {
         let formatter = DateFormatter()
         formatter.timeZone = .current
         formatter.dateFormat = "HH:mm"
-        return formatter.string(from: getExpectedArrivalTimeDate)
+        let dateDate = self.getExpectedArrivalTimeDate
+        return formatter.string(from: dateDate!)
     }
     
-    var getExpectedArrivalTimeDate: Date {
+    var getExpectedArrivalTimeDate: Date? {
         let formatter  = ISO8601DateFormatter()
-        return formatter.date(from: getExpectedArrivalTime)!
+        formatter.formatOptions = [.withFractionalSeconds, .withInternetDateTime]
+        return formatter.date(from: self.getExpectedArrivalTime)
     }
     
     // Equatable
