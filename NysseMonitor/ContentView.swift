@@ -23,7 +23,7 @@ struct ContentView: View {
                             
                             self.stopPoints.forEach { stopPoint in
                                 AF.request(stopPoint.getMonitoringUrl).responseString {
-                                    response in stopPoint.setJson(json: response.value ?? "EMPTY")
+                                    response in stopPoint.buildDomainModelFromJSON(json: response.value ?? "EMPTY")
                                 }
                             }
                         }

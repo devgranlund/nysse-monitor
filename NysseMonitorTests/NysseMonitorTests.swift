@@ -52,23 +52,38 @@ class NysseMonitorTests: XCTestCase {
         shortName: "0505")
         XCTAssertNotNil(rautatieasema)
         
-        rautatieasema!.setJson(json: jsonResponse)
+        rautatieasema!.buildDomainModelFromJSON(json: jsonResponse)
         XCTAssertNotNil(rautatieasema)
         
+        // with fractions
         let line0 = rautatieasema?.getDepartures?.getLines[0]
         XCTAssertNotNil(line0)
-        XCTAssertEqual(line0?.getLineRef, "8")
+        XCTAssertEqual(line0?.getLineRef, "1")
         XCTAssertEqual(line0?.getExpectedArrivalTime, "2020-01-04T01:06:16.475+02:00")
         XCTAssertNotNil(line0?.getExpectedArrivalTimeDate)
         XCTAssertEqual(line0?.getExactExpectedArrivalTime, "01:06")
         
+        // without fractions
         let line1 = rautatieasema?.getDepartures?.getLines[1]
         XCTAssertNotNil(line1)
-        XCTAssertEqual(line1?.getLineRef, "3A")
+        XCTAssertEqual(line1?.getLineRef, "11B")
         XCTAssertEqual(line1?.getExpectedArrivalTime, "2020-01-04T02:30:57+02:00")
         XCTAssertNotNil(line1?.getExpectedArrivalTimeDate)
-        //XCTAssertEqual(line1?.getExactExpectedArrivalTime, "02:30")
+        XCTAssertEqual(line1?.getExactExpectedArrivalTime, "02:30")
+    }
+    
+    func testStopPointLineFiltering() {
+        let rautatieasema = StopPoint.init(url: "http://178.217.134.14/journeys/api/1/stop-points/0505",
+        monitoringUrl: "http://data.itsfactory.fi/journeys/api/1/stop-monitoring?stops=0505",
+                                          name: "Rautatieasema",
+        shortName: "0505")
+        XCTAssertNotNil(rautatieasema)
         
+        rautatieasema!.buildDomainModelFromJSON(json: jsonResponse)
+        XCTAssertNotNil(rautatieasema)
+        
+        // one line is filtered out
+        XCTAssertEqual(rautatieasema?.getDepartures?.getLines.count, 2)
     }
     
     let jsonResponse = """
@@ -86,7 +101,7 @@ class NysseMonitorTests: XCTestCase {
       "body": {
         "0505": [
           {
-            "lineRef": "8",
+            "lineRef": "1",
             "directionRef": "0",
             "vehicleLocation": {
               "longitude": "23.8234406",
@@ -116,7 +131,7 @@ class NysseMonitorTests: XCTestCase {
             }
           },
           {
-            "lineRef": "3A",
+            "lineRef": "11B",
             "directionRef": "0",
             "vehicleLocation": {
               "longitude": "23.8432941",
@@ -146,7 +161,7 @@ class NysseMonitorTests: XCTestCase {
             }
           },
           {
-            "lineRef": "1",
+            "lineRef": "3A",
             "directionRef": "0",
             "vehicleLocation": {
               "longitude": "23.9096889",

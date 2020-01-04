@@ -64,7 +64,8 @@ class StopPoint: Hashable {
         return self.departures
     }
     
-    func setJson(json: String){
+    // This function has a side effect: by setting json, also the  domain model is created.
+    func buildDomainModelFromJSON(json: String){
         
         // Dirty trick to mutate original JSON message
         // - hard coded stop point short name as a JSON element key is replaced in
@@ -74,6 +75,7 @@ class StopPoint: Hashable {
         self.json = mutatedJson
         do {
             self.departures = try JSONDecoder().decode(Departures.self, from: mutatedJson.data(using: .utf8)!)
+            self.departures?.removeUnwantedLines()
         } catch {
             print(error)
         }
@@ -91,7 +93,7 @@ class StopPoint: Hashable {
 }
 
 struct Departures: Codable {
-    let body: Body?
+    var body: Body?
     
     private enum CodingKeys: String, CodingKey {
         case body = "body"
@@ -100,13 +102,35 @@ struct Departures: Codable {
     var getLines: [Line]{
         return self.body!.lines!
     }
+    
+    mutating func removeUnwantedLines() {
+        self.body!.removeUnwantedLines()
+    }
 }
 
 struct Body: Codable {
-    let lines: [Line]?
+    var lines: [Line]?
     
     private enum CodingKeys: String, CodingKey {
         case lines = "lines"
+    }
+    
+    mutating func removeUnwantedLines() {
+        self.lines = self.lines!.filter {
+            ($0.lineRef?.elementsEqual("1"))!
+            ||
+            ($0.lineRef?.elementsEqual("1A"))!
+            ||
+            ($0.lineRef?.elementsEqual("1B"))!
+            ||
+            ($0.lineRef?.elementsEqual("1C"))!
+            ||
+            ($0.lineRef?.elementsEqual("11"))!
+            ||
+            ($0.lineRef?.elementsEqual("11B"))!
+            ||
+            ($0.lineRef?.elementsEqual("11C"))!
+        }
     }
 }
 
@@ -146,9 +170,14 @@ struct Line: Codable, Hashable {
     }
     
     var getExpectedArrivalTimeDate: Date? {
-        let formatter  = ISO8601DateFormatter()
-        formatter.formatOptions = [.withFractionalSeconds, .withInternetDateTime]
-        return formatter.date(from: self.getExpectedArrivalTime)
+        
+        let formatterWithFractional  = ISO8601DateFormatter()
+        formatterWithFractional.formatOptions = [.withFractionalSeconds, .withInternetDateTime]
+        let formatterWithoutFractional  = ISO8601DateFormatter()
+        formatterWithoutFractional.formatOptions = [.withInternetDateTime]
+        
+        let date = formatterWithFractional.date(from: self.getExpectedArrivalTime) ?? formatterWithoutFractional.date(from: self.getExpectedArrivalTime)
+        return date
     }
     
     // Equatable
